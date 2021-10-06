@@ -56,7 +56,7 @@ class Contenedor{
         const contenido = await fs.promises.readFile(`./${this.file}`,'utf-8')
         const listaproductos = JSON.parse (contenido);
         if (numero)  {  
-            listaproductos[numero-1] = '';
+            listaproductos.splice([numero-1],1);
             productos = listaproductos;
             const productoString = JSON.stringify(productos,null,2)
             await fs.promises.writeFile(`./${this.file}`,productoString)
@@ -77,6 +77,29 @@ class Contenedor{
         };
     }
     
+    async update(id,producto){
+
+        const lista= await this.getAll();
+        const elementoGuardado= lista.find((item)=> item.id === parseInt(id));
+        const indiceElementoGuardado= lista.findIndex((item)=> item.id === parseInt(id));
+
+        if (!elementoGuardado) {
+            console.error('no existe el elemento')
+            return null;
+        }
+        
+        const elementoActualizado = {
+            ...elementoGuardado,
+            ...producto
+        };
+
+        lista[indiceElementoGuardado] = elementoActualizado;
+
+        const productoString = JSON.stringify(lista,null,2)
+        await fs.promises.writeFile(`./${this.file}`,productoString)
+
+        return elementoActualizado
+    }
     
 
 }

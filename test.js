@@ -22,10 +22,10 @@ const main = async ()=> {
 
     // Borrar archivos 
     // await miContenedor.deleteAll();
-    let list = await miContenedor.getById(1);
-    console.log(list);
-//     let list = await miContenedor.deleteById(3);
-//     console.log(list);
+    // let list = await miContenedor.getById(1);
+    // console.log(list);
+    // let list = await miContenedor.deleteById(4);
+    // console.log(list);
 };
 main();
 

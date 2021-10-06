@@ -1,30 +1,24 @@
 var express = require ('express');
 
 const Contenedor= require('./Contenedor');
+const productosRouter = require('./router/productos');
 const contenedor= new Contenedor('./productos.JSON');
 
-const app = express();
+const server = express();
 const PORT= 8080
 
- app.get('/',(solicitud,respuesta,siguiente)=> {
+server.use(express.json())
+server.use(express.urlencoded({extended: true}))
 
-    respuesta.send('Caserolaaa');
+server.get('/',(solicitud,respuesta,siguiente)=> {
+
+    respuesta.send('Home');
  })
 
- app.listen(PORT, () => {
-     console.log(`Servidor En el puerto # ${PORT}`);
- })
+server.use('/api/productos',productosRouter)
 
- app.get('/productos',async(solicitud,respuesta)=> {
-    const productos = await  contenedor.getAll();
-    respuesta.json(productos);   
- })
-
- app.get('/productoRandom',async(solicitud,respuesta)=> {
-   let obtenerRandom= (min,max )=> Math.floor(Math.random() *(max - min +1)) + min;
-   const productos = await  contenedor.getAll();
-   const idRandom = obtenerRandom(1,productos.length)
-   const productosrandom = await  contenedor.getById(idRandom);
-   respuesta.json(productosrandom);   
+server.listen(PORT, () => {
+  console.log(`Servidor En el puerto # ${PORT}`);
 })
+
 

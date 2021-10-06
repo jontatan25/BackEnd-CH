@@ -1,6 +1,6 @@
 [
   {
-    "title": "titulo1",
+    "title": "tituloPrimero",
     "price": "6 USD",
     "id": 1
   },
@@ -8,10 +8,5 @@
     "title": "titulo2",
     "price": "7 USD",
     "id": 2
-  },
-  {
-    "title": "titulo3",
-    "price": "8 USD",
-    "id": 3
   }
 ]
