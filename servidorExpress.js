@@ -2,7 +2,7 @@ var express = require ('express');
 
 const Contenedor= require('./Contenedor');
 const productosRouter = require('./router/productos');
-const contenedor= new Contenedor('./productos.JSON');
+
 
 const server = express();
 const PORT= 8080

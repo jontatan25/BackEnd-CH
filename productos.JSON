@@ -1,12 +1,12 @@
 [
   {
-    "title": "tituloPrimero",
+    "name": "Producto 1",
     "price": "6 USD",
-    "id": 1
+    "URL": "https://cdn3.iconfinder.com/data/icons/social-media-2180/48/16-Reddit-256.png"
   },
   {
-    "title": "titulo2",
+    "name": "Producto 2",
     "price": "7 USD",
-    "id": 2
+    "URL": "https://cdn3.iconfinder.com/data/icons/social-media-2180/48/18-Blogger-256.png"
   }
 ]

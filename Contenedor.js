@@ -1,5 +1,5 @@
 const fs = require ('fs');
-const { stringify } = require('querystring');
+
 
 let productos = [];
 class Contenedor{

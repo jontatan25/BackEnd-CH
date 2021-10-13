@@ -1,0 +1,30 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head'); %>
+</head>
+<body>
+  <header>
+    <%- include('../partials/header'); %>
+  </header>
+  <main>
+    <div class="jumbotron">
+      <form><label for="nombre">Nombre:       </label><input id="nombre" type="text"></form>
+      <form><label for="precio">Precio:       </label><input id="precio" type="text"></form>
+      <form><label for="Foto URL">Foto URL:       </label><input id="fotoURL" type="text"></form>
+      <button type="button" class="btn btn-success">Enviar</button>
+      <h3><%= tagline %></h3>
+      <% productos.forEach((productItem) => { %>
+        <li>
+          Name: <%= productItem.name %>
+        </li>
+      <% }) %>
+      <a class="btn btn-primary" href="http://localhost:8080/list-productos" role="button">Ir a list-productos</a>
+    </div>
+  </main>
+  <footer>
+    <%- include('../partials/footer'); %>
+  </footer>
+</body>
+</html> 
