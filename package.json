@@ -2,13 +2,13 @@
   "dependencies": {
     "ejs": "^3.1.6",
     "express": "^4.17.2",
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "pug": "^3.0.2"
   },
   "name": "y",
   "description": "",
   "version": "1.0.0",
   "main": "Contenedor.js",
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

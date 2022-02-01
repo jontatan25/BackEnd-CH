@@ -1,0 +1,39 @@
+doctype html
+html(lang='en')
+  head
+    title Incorporando EJS
+    link(rel='stylesheet' href='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css' integrity='sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T' crossorigin='anonymous')
+    style.
+      body {
+      padding-top: 50px;
+      }
+  body
+    header
+      nav.navbar.navbar-expand-lg.navbar-light.bg-light
+        a.navbar-brand INCORPORANDO EJS
+        ul.navbar-nav.mr-auto
+          li.nav-item
+            a.nav-link(href='/') Home
+    main
+      .jumbotron
+          if productos.length > 0
+            h3 tagline
+          each product in productos
+            table.table.table-dark
+              thead
+                tr
+                  th(scope='col') Nombre
+                  th(scope='col') Precio
+                  th(scope='col') Foto
+              tbody
+                tr
+                  td= product.nombre 
+                  td= product.precio
+                  td
+                    img(src='product.URL' alt='Foto' height='30px')
+          else
+            h3.alert.alert-danger No Hay datos
+        
+          a.btn.btn-primary(href='http://localhost:8080' role='button') Ir a Form
+    footer
+      p.text-center.text-muted Copyright 2021 The Awesome People
