@@ -7,6 +7,7 @@
     <header><%- include('../partials/header'); %></header>
     <main>
       <div class="jumbotron">
+        <% if (productos.length > 0){%>
         <h3><%= tagline %></h3>
         <table class="table table-dark">
           <thead>
@@ -19,14 +20,18 @@
           <tbody>
             <% productos.forEach((product) => { %>
             <tr>
-              <td><%= product.name %></td>
-              <td><%= product.price %></td>
+              <td><%= product.nombre %></td>
+              <td><%= product.precio %></td>
               <td><img src="<%= product.URL %>" alt="Foto" height="30px" /></td>
             </tr>
             <% }) %>
           </tbody>
+          
         </table>
-        <a class="btn btn-primary" href="http://localhost:8080/form" role="button">Ir a Form</a>
+        <% } else{ %>
+          <h3 class="alert alert-danger">No Hay datos</h3>
+          <% } %>
+        <a class="btn btn-primary" href="http://localhost:8080" role="button">Ir a Form</a>
       </div>
     </main>
     <footer><%- include('../partials/footer'); %></footer>
