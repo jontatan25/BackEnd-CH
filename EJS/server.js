@@ -1,29 +1,49 @@
-const express = require('express');
+const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
+
 const app = express();
-const productos= []
-app.use(express.urlencoded({extended:true}))
+const server = http.createServer(app);
+const io = new Server(server);
+const products = [];
+const msgs = [];
 
-app.set('view engine', 'ejs');
+// app.use(express.static(__dirname + '/public'));
+app.set("view engine", "ejs");
 
-app.get('/productos',(req,res)=>{
-    const tagline= 'Productos';
-    res.render('pages/productlist',{
-        productos,
-        tagline
+app.get("/", (req, res) => {
+  res.render("pages/index");
+});
+
+io.on("connection", (socket) => {
+  console.log("a user connected");
+  // send chat to the user that just connected
+  socket.emit("send products", products);
+  // // listening and sending mssgs to all users
+  socket.on("send products", (product) => {
+    products.push({
+      socketId: socket.id,
+      name: product.name,
+      price: product.price,
+      url: product.photoUrl,
     });
+    console.log(products);
+    // io.sockets.emit('chat message', msgs);
+  });
+  socket.emit("chat message", msgs);
+  // listening and sending mssgs to all users
+  socket.on("chat message", (userInfo) => {
+    msgs.push({ email: userInfo.email, userMsg: userInfo.message });
+    console.log(msgs);
+    io.sockets.emit("chat message", msgs);
+  });
+  socket.on("disconnect", () => {
+    console.log("user disconnected");
+  });
 });
 
-app.get('/',(req,res)=>{
-    res.render('pages/index',{
-        productos,
-    });
+server.listen(3000, () => {
+  console.log("listening on PORT:3000");
 });
 
-app.post('/productos',(req,res)=>{
-    productos.push(req.body)
-    console.log(productos);
-    res.redirect('/productos')
-});
-
-const PORT=8080;
-app.listen(PORT,() => console.log(`Escuchando servidor en el puerto ${PORT}`))
+server.on("error", (error) => console.log(`Server error: ${error}`));
