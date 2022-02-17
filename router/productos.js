@@ -12,18 +12,17 @@ productosRouter.get('/',async(req,res) => {
 })
 
 productosRouter.get('/:id',async(req,res) => {
-    const productos = await  contenedor.getById(req.params.id);
-    if (!productos) {
+    const productById = await  contenedor.getById(req.params.id);
+    if (!productById) {
         res.send({
             error: 'Producto no encontradoo'
         })
     } else
-    res.send(productos)
+    res.send(productById)
 })
 
 productosRouter.post('/',async(req,res) => {
-    const nuevoProducto =req.body;
-    const idProducto = await  contenedor.save(nuevoProducto);
+    const idProducto = await  contenedor.cartSave();
  
     res.send({
         message:'Success',

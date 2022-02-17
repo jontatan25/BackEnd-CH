@@ -1,12 +1,22 @@
 [
   {
-    "name": "Producto 1",
-    "price": "6 USD",
-    "URL": "https://cdn3.iconfinder.com/data/icons/social-media-2180/48/16-Reddit-256.png"
+    "id": 1,
+    "timestamp": "10:00",
+    "name": "Product 1",
+    "description": "Product 1",
+    "codigo": "#ahf7o3df",
+    "photoUrl": "https://cdn3.iconfinder.com/data/icons/social-media-2180/48/18-Blogger-256.png",
+    "price": "11 USD",
+    "stock": "10"
   },
   {
-    "name": "Producto 2",
-    "price": "7 USD",
-    "URL": "https://cdn3.iconfinder.com/data/icons/social-media-2180/48/18-Blogger-256.png"
+    "name": "Product 2",
+    "description": "This is the product Number 2",
+    "codigo": "#ahf7o3df",
+    "photoUrl": "https://cdn3.iconfinder.com/data/icons/social-media-2180/48/18-Blogger-256.png",
+    "price": "11 USD",
+    "stock": "10",
+    "id": 2,
+    "timestamp": "2022-2-16 11:23:28"
   }
 ]
