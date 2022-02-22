@@ -2,6 +2,7 @@ const express = require('express')
 const Contenedor= require('../Contenedor');
 const contenedor= new Contenedor('./carritos.JSON');
 const {Router} = express
+
 const carritoRouter= Router()
 
 carritoRouter.get('/',async(req,res) => {
@@ -59,9 +60,28 @@ carritoRouter.delete('/:id/productos/:id_prod',async(req,res)=>{
     const productDelete = await  contenedor.deleteByIdProd(...itemInfo);
 
     res.send({
-        message: `El producto #  del carro  fue borrado con exito.`,
+        message: `El producto fue borrado con exito.`,
         data:productDelete
     })
+
+    
+})
+
+carritoRouter.delete('/:id',async(req,res)=>{
+
+    const productDelete = await  contenedor.deleteByIdCart(req.params.id);
+
+    if (!productDelete) {
+        res.send({
+            message: `El Carro # ${req.params.id} No existe.`,   
+        })
+    } else {
+        
+        res.send({
+            message: `El Carro con el id # ${req.params.id} fue borrado con exito.`,
+            data:productDelete
+        })
+    }
 })
 
 module.exports = carritoRouter;
