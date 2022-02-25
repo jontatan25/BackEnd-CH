@@ -15,114 +15,107 @@ class Contenedor {
     this.tableName = tableName;
   }
 
-  async getAll() {
-    return await 
-     knex
-      .select("*")
-      .from("cars")
-      .then((rows) => {
-        console.log(`table cars selected`);
-        for (row of rows) {
-          console.log(`${row["id"]}${row["name"]}${row["price"]}`);
-        }
+  async getAll(table) {
+    try {
+      async function getUsers() {
+        return await knex.select("*").from(table);
         
-      })
-      .catch((err) => {
-        console.log(err);
-        //   capturando el error
-        throw err;
-      })
-      .finally(() => {
-        //   liberar recursos, destruye la conexion
-        knex.destroy();
-      });
+      }
+      return (async function () {
+        const res = await getUsers();
+        
+        const productsArray = [];
+        for (let i = 0; i < res.length; i++) {
+          const newObject = { 
+            socketId: res[i].socketId,
+            name: res[i].name,
+            price: res[i].price,
+            url: res[i].url          
+          };
+          productsArray.push(newObject);
+        }
+        console.log(productsArray);
+      })();
+      
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
+  async save(cars,table) {
+    try {
+      async function getUsers() {
+        return await knex(table)
+        .insert(cars)
+      }
+      
+      return (async function () {
+        const res = await getUsers();
+        console.log("cars inserted",res);
+      })();
+      
+    } catch (error) {
+      console.error("Error:", error);
+    }
   
-}
-  async save(producto) {
-    knex.schema
-      .createTable(producto, (table) => {
-        table.increments("id");
-        table.string("name");
-        table.integer("price");
-      })
-      .then(() => {
-        console.log("table cars created");
-      })
-      .catch((err) => {
-        console.log(err);
-        //   capturando el error
-        throw err;
-      })
-      .finally(() => {
-        //   liberar recursos, destruye la conexion
-        knex.destroy();
-      });
   }
 
-  async getById(numero) {
+  async getById(table,id) {
     try {
-      const contenido = await fs.promises.readFile(`./${this.file}`, "utf-8");
-      const listaproductos = JSON.parse(contenido);
-      const findProduct = listaproductos.findIndex((x) => x.id == numero);
-      if (findProduct != -1) {
-        return listaproductos[findProduct];
-      } else {
-        return null;
+      async function getUsers() {
+        return await knex.select("*").from(table).where({ id: id });
       }
+      return (async function () {
+        const res = await getUsers();
+        console.log(res);
+      })();
+      
     } catch (error) {
       console.error("Error:", error);
     }
   }
 
-
-  async deleteById(numero) {
+  async deleteById(table,id) {
     try {
-      const contenido = await fs.promises.readFile(`./${this.file}`, "utf-8");
-      const listaproductos = JSON.parse(contenido);
-      const findProduct = listaproductos.findIndex((x) => x.id == numero);
-
-      if (findProduct != -1) {
-        listaproductos.splice(findProduct, 1);
-        productos = listaproductos;
-        const productoString = JSON.stringify(productos, null, 2);
-        await fs.promises.writeFile(`./${this.file}`, productoString);
-        return listaproductos;
-      } else {
-        return null;
+      async function getUsers() {
+        return await knex(table).where({ id: id }).del();
       }
+      return (async function () {
+        const res = await getUsers();
+        console.log(`element #${id} deleted`);
+      })();
+      
     } catch (error) {
       console.error("Error:", error);
     }
   }
 
-  async deleteAll() {
+  async deleteAll(table) {
     try {
-      const contenido = await fs.promises.writeFile(`./${this.file}`, "");
+      async function getUsers() {
+        return await knex(table).del();
+      }
+      return (async function () {
+        const res = await getUsers();
+        console.log(`table #${table} has been deleted`);
+      })();
+      
     } catch (error) {
       console.error("Error:", error);
     }
   }
 
-  async update(productInfo) {
-    const lista = await this.getAll();
-
-    const getProductId = lista.findIndex(
-      (item) => item.id === parseInt(productInfo[0].id)
-    );
-    const newProduct = productInfo[0];
-
-    if (getProductId === -1) {
-      console.error("no existe el elemento");
-      return null;
-    } else {
-      const updatedProduct = {
-        ...lista[getProductId],
-        product: newProduct,
-      };
-      lista[getProductId] = updatedProduct;
-      const productoString = JSON.stringify(lista, null, 2);
-      await fs.promises.writeFile(`./${this.file}`, productoString);
-      return lista;
+  async update(table,id,name,price) {
+    try {
+      async function getUsers() {
+        return await knex(table).where({ id: id }).update({name:name},{price:price});
+      }
+      return (async function () {
+        const res = await getUsers();
+        console.log(`element #${id} has been updated`);
+      })();
+      
+    } catch (error) {
+      console.error("Error:", error);
     }
   }
 }

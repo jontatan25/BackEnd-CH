@@ -9,7 +9,8 @@ const io = new Server(server);
 const Contenedor= require('../ContenedorDB');
 const contenedor= new Contenedor('./options/knexConfig','cars');
 
-const products = [];
+const getProducts = contenedor.getAll('products');
+const products = JSON.parse(JSON.stringify(getProducts))
 const msgs = [];
 
 // app.use(express.static(__dirname + '/public'));
@@ -25,12 +26,13 @@ io.on("connection", (socket) => {
   socket.emit("send products", products);
   // // listening and sending mssgs to all users
   socket.on("send products", (product) => {
-    products.push({
+    const newProduct={
       socketId: socket.id,
       name: product.name,
       price: product.price,
       url: product.photoUrl,
-    });
+    }
+    contenedor.save(newProduct,'products')
     console.log(products);
     socket.emit("send products", products);
   });
