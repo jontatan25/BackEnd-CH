@@ -1,4 +1,4 @@
-const { options } = require("./options/knexConfig");
+const { options } = require("./options/sqlite3Config");
 const knex = require("knex")(options);
 
 //   Getting the time for Timestamp
@@ -23,11 +23,11 @@ class Contenedor {
       console.error("Error:", error);
     }
   }
-  async save(cars,table) {
+  async save(message,table) {
     try {
       let itemList=
-        await knex(table).insert(cars);
-        console.log(`Se han agregado los items a la tabla ${table}`)
+        await knex(table).insert(message);
+        console.log(`Se han agregado los mensajes a la tabla ${table}`)
           return itemList
    
     } catch (error) {

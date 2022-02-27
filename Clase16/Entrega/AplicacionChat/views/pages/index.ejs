@@ -95,7 +95,13 @@
       var input = document.getElementById("input");
       var inputEmail = document.getElementById("inputEmail");
 
-      var today = new Date();
+
+      formChat.addEventListener("submit", function (e) {
+        e.preventDefault();
+        if (inputMessage.value) {
+
+          // getting the actual time of the messages
+          var today = new Date();
       var date =
         today.getFullYear() +
         "/" +
@@ -106,25 +112,26 @@
         today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
       var dateTime = date + " " + time;
 
-      formChat.addEventListener("submit", function (e) {
-        e.preventDefault();
-        if (inputMessage.value) {
+      // Saving message info
+      
           var userInfo = {
-            message: inputMessage.value,
+            text: inputMessage.value,
             email: inputEmail.value,
+            time: dateTime
           };
           socket.emit("chat message", userInfo);
         }
       });
 
-      socket.on("chat message", (msgs) => {
-        messages.innerHTML = msgs
+      socket.on("chat message", (messages) => {
+        console.log("los datos son "+ messages)
+        messages.innerHTML = messages
           .map(
             (msg) =>
               `<li style="display:flex"> 
                 <p  style="color:blue; margin-right:5px; font-weight:bold"> ${msg.email}</p> 
-                <p  style="color:brown; margin-right:10px">[ ${dateTime}]</p>   
-                <p  style="color:green; margin-right:10px; font-style:italic;">Message: ${msg.userMsg}</p> ` +
+                <p  style="color:brown; margin-right:10px">[ ${msg.time}]</p>   
+                <p  style="color:green; margin-right:10px; font-style:italic;">Message: ${msg.text}</p> ` +
               "</li>"
           )
           .join("");

@@ -1,15 +1,16 @@
-const {options} = require("./options/mariadb");
+const {options} = require("../sqlite3Config");
 const knex = require("knex")(options);
 
 knex.schema
-  .createTable("cars", (table) => {
+  .createTable("messages", (table) => {
     // No olvidar primary y not null
     table.increments("id");
-    table.string("name");
-    table.integer("price");
+    table.string("email");
+    table.string("text");
+    table.string("time");
   })
   .then(() => {
-    console.log("table cars created");
+    console.log("table chats created");
   })
   .catch((err) => {
     console.log(err);
