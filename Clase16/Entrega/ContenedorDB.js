@@ -28,7 +28,7 @@ class Contenedor {
       let itemList=
         await knex(table).insert(cars);
         console.log(`Se han agregado los items a la tabla ${table}`)
-          return itemList
+          return await itemList
    
     } catch (error) {
       console.error("Error:", error);

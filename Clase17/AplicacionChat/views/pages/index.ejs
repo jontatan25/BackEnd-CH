@@ -36,19 +36,19 @@
           <tbody id="productContainer"></tbody>
         </table>
       </div>
-
+      <ul id="messages"></ul>
       <form id="formChat" action="">
         <input
           id="inputEmail"
           autocomplete="off"
           placeholder="Enter your Email"
         />
-        <ul id="messageList"></ul>
         <input
           id="inputMessage"
           autocomplete="off"
           placeholder="Type your message"
         />
+        
         <button>Send</button>
       </form>
     </main>
@@ -95,13 +95,7 @@
       var input = document.getElementById("input");
       var inputEmail = document.getElementById("inputEmail");
 
-
-      formChat.addEventListener("submit", function (e) {
-        e.preventDefault();
-        if (inputMessage.value) {
-
-          // getting the actual time of the messages
-          var today = new Date();
+      var today = new Date();
       var date =
         today.getFullYear() +
         "/" +
@@ -112,25 +106,45 @@
         today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
       var dateTime = date + " " + time;
 
-      // Saving message info
-      
+      formChat.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        if (inputMessage.value) {
+          // getting the actual time of the messages
+          var today = new Date();
+          var date =
+            today.getFullYear() +
+            "/" +
+            (today.getMonth() + 1) +
+            "/" +
+            today.getDate();
+          var time =
+            today.getHours() +
+            ":" +
+            today.getMinutes() +
+            ":" +
+            today.getSeconds();
+          var dateTime = date + " " + time;
+
+          // Saving message info
+
           var userInfo = {
-            text: inputMessage.value,
+            
             email: inputEmail.value,
-            time: dateTime
+            text: inputMessage.value,
+            time: dateTime,
           };
           socket.emit("chat message", userInfo);
         }
       });
 
-      socket.on("chat message", (messages) => {
-        console.log("los datos son "+ messages)
-        messages.innerHTML = messages
+      socket.on("chat message", (messagesArr) => {
+        messages.innerHTML = messagesArr
           .map(
             (msg) =>
               `<li style="display:flex"> 
                 <p  style="color:blue; margin-right:5px; font-weight:bold"> ${msg.email}</p> 
-                <p  style="color:brown; margin-right:10px">[ ${msg.time}]</p>   
+                <p  style="color:brown; margin-right:10px">[ ${msg.time} ]</p>   
                 <p  style="color:green; margin-right:10px; font-style:italic;">Message: ${msg.text}</p> ` +
               "</li>"
           )

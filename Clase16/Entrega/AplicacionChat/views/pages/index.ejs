@@ -43,7 +43,7 @@
           autocomplete="off"
           placeholder="Enter your Email"
         />
-        <ul id="messageList"></ul>
+        <ul id="messagesList"></ul>
         <input
           id="inputMessage"
           autocomplete="off"
@@ -63,7 +63,7 @@
           var product = {
             name: inputName.value,
             price: inputPrice.value,
-            url: inputUrl.value,
+            photoUrl: inputUrl.value,
           };
           socket.emit("send products", product);
         }
@@ -90,7 +90,7 @@
       });
     </script>
     <script>
-      var messages = document.getElementById("messages");
+      var messages = document.getElementById("messagesList");
       var form = document.getElementById("formChat");
       var input = document.getElementById("input");
       var inputEmail = document.getElementById("inputEmail");

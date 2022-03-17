@@ -6,7 +6,7 @@ const MessageModel = require("../models/MsModel");
 const URL = "mongodb://localhost:27017/ecommerce";
 
 let container = [];
-let containerMsg = []
+let containerMsg = [];
 
 class Contenedor {
   constructor(file) {
@@ -14,15 +14,14 @@ class Contenedor {
   }
 
   // PRODUCTS
-  async saveProduct(product) {
+  async saveMessage(product) {
     try {
       await mongoose.connect(URL);
       console.log(`Base de datos connectada en ${URL} `);
-      const prod1 = new ProductModel({
-        socketId: product.socketId,
-        name: product.name,
-        url: product.url,
-        price: product.price,
+      const prod1 = new MessageModel({
+        email: product.email,
+        text: product.text,
+        time: product.time,
       });
       await prod1.save();
       console.log("Documento Guardado");
@@ -49,21 +48,24 @@ class Contenedor {
   }
   async getbyId(id) {
     try {
+      await mongoose.connect(URL);
       console.log(`Base de datos connectada en ${URL} `);
-      const getProducts = await ProductModel.find({});
+      const getProducts = await ProductModel.find({id:id});
       let doc = getProducts.find((product) => product.id === id);
-      console.log(doc);
+      return doc;
     } catch (error) {
       console.log(`Server error: ${error}`);
     } finally {
       mongoose.disconnect().catch((error) => console(error));
     }
   }
-  async update() {
+  async update(id, value) {
     try {
+      await mongoose.connect(URL);
+
       let resultado = await ProductModel.updateOne(
-        { socketId: 3 },
-        { $set: { price: 100 } }
+        { id: id },
+        { $set: { value: value } }
       );
       console.log(resultado);
     } catch (error) {
@@ -74,6 +76,7 @@ class Contenedor {
   }
   async deleteById(id) {
     try {
+      await mongoose.connect(URL);
       let resultado = await ProductModel.deleteOne({ id: id });
       console.log(resultado);
     } catch (error) {
@@ -84,24 +87,6 @@ class Contenedor {
   }
 
   // MESSAGES
-
-  async saveMessage(message) {
-    try {
-      await mongoose.connect(URL);
-      console.log(`Base de datos connectada en ${URL} `);
-      const newMessage = new MessageModel({
-        email: message.email,
-        text: message.text,
-        time: message.time,
-      });
-      await newMessage.save();
-      console.log("Message saved");
-    } catch (error) {
-      console.log(`Server error: ${error}`);
-    } finally {
-      await mongoose.disconnect().catch((error) => console(error));
-    }
-  }
 
   async getAllMessages() {
     try {
