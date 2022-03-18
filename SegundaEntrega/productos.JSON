@@ -1,0 +1,53 @@
+[
+  {
+    "id": 1,
+    "timestamp": "2022-2-21 20:41:12",
+    "product": {
+      "name": "Product 5",
+      "description": "This is the product Number 1",
+      "codigo": "#ahf7o3df",
+      "photoUrl": "https://cdn3.iconfinder.com/data/icons/social-media-2180/48/18-Blogger-256.png",
+      "price": "11 USD",
+      "stock": "10"
+    }
+  },
+  {
+    "id": 2,
+    "timestamp": "2022-2-21 21:26:4",
+    "product": {
+      "name": "Product 5",
+      "description": "This is the product Number 2",
+      "codigo": "#ahf7o3df",
+      "photoUrl": "https://cdn3.iconfinder.com/data/icons/social-media-2180/48/18-Blogger-256.png",
+      "price": "11 USD",
+      "stock": "10"
+    }
+  },
+  {
+    "id": 3,
+    "timestamp": "2022-2-21 21:26:24",
+    "product": {
+      "id": "3",
+      "product": {
+        "name": "New Product",
+        "description": "This is the product Number 4",
+        "codigo": "#ahf7o3df",
+        "photoUrl": "https://cdn3.iconfinder.com/data/icons/social-media-2180/48/18-Blogger-256.png",
+        "price": "11 USD",
+        "stock": "10"
+      }
+    }
+  },
+  {
+    "id": 4,
+    "timestamp": "2022-3-18 1:37:25",
+    "product": {
+      "name": "New Product",
+      "description": "This is the product Number 5",
+      "codigo": "#ahf7o3df",
+      "photoUrl": "https://cdn3.iconfinder.com/data/icons/social-media-2180/48/18-Blogger-256.png",
+      "price": "12 USD",
+      "stock": "10"
+    }
+  }
+]
