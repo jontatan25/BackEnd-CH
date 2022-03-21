@@ -20,20 +20,21 @@ class Contenedor {
       console.log(`Base de datos connectada en ${URL} `);
       const cart1 = new CartModel({
         timestamp: Date.now(),
-        products: [{
-
-          timestamp: "empty",
-          nombre: "empty",
-          descripcion: "empty",
-          codigo: "empty",
-          foto: "empty",
-          precio: 0,
-          stock: 0,
-        }],
+        products: [
+          {
+            timestamp: "empty",
+            nombre: "empty",
+            descripcion: "empty",
+            codigo: "empty",
+            foto: "empty",
+            precio: 0,
+            stock: 0,
+          },
+        ],
       });
       await cart1.save();
       console.log("Documento Guardado");
-      return cart1._id
+      return cart1._id;
     } catch (error) {
       console.log(`Server error: ${error}`);
     } finally {
@@ -67,26 +68,11 @@ class Contenedor {
       mongoose.disconnect().catch((error) => console(error));
     }
   }
-  async update(id, value) {
-    try {
-      await mongoose.connect(URL);
-
-      let resultado = await ProductModel.updateOne(
-        { id: id },
-        { $set: { value: value } }
-      );
-      console.log(resultado);
-    } catch (error) {
-      console.log(`Server error: ${error}`);
-    } finally {
-      mongoose.disconnect().catch((error) => console(error));
-    }
-  }
+  
   async deleteProductById(id) {
     try {
       await mongoose.connect(URL);
-      await CartModel.deleteOne({ _id: {id} });
-      
+      await CartModel.deleteOne({ _id: { id } });
     } catch (error) {
       console.log(`Server error: ${error}`);
     } finally {
@@ -96,25 +82,16 @@ class Contenedor {
 
   // PRODUCTS
 
-  async saveProduct(cartItem) {
+  async saveProduct() {
     try {
       await mongoose.connect(URL);
-      console.log(`Base de datos connectada en ${URL} `);
-      const prod1 = new ProductModel({
-        timestamp: date.now(),
-        nombre: product.nombre,
-        descripcion: product.descripcion,
-        codigo: product.codigo,
-        foto: product.foto,
-        precio: product.precio,
-        stock: product.stock,
-      });
-      await prod1.save();
-      console.log("Documento Guardado");
+      const getProducts = await CartModel.find({ _id: "62347fac25d2e1b6c1e49459"});
+     
+      console.log(getProducts)
     } catch (error) {
       console.log(`Server error: ${error}`);
     } finally {
-      await mongoose.disconnect().catch((error) => console(error));
+      mongoose.disconnect().catch((error) => console(error));
     }
   }
 }

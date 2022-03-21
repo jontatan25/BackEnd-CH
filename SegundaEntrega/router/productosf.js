@@ -2,17 +2,14 @@ const express = require("express");
 const Contenedor = require("../Contenedor");
 const contenedor = new Contenedor("./productos.JSON");
 const { Router } = express;
-const productosRouter = Router();
-
-const Contenedorm = require("../containers/mongoContainer");
-const contenedorProducts = new Contenedorm("products");
+const productosRouterf = Router();
 
 const ContenedorF = require("../containers/firebase");
 const contenedorFire = new ContenedorF("CartFirebase");
 
 
 
-productosRouter.get("/admin", async (req, res) => {
+productosRouterf.get("/admin", async (req, res) => {
   const checkAdmin = await contenedor.checkAdmin();
   if (checkAdmin) {
     res.send({
@@ -24,52 +21,52 @@ productosRouter.get("/admin", async (req, res) => {
   }
 });
 
-// MONGODB
+// FIREBASE
 
-productosRouter.get("/", async (req, res) => {
-  const productos = await contenedorProducts.getAll();
-  res.send({
-    message: "Success",
-    data: productos,
-  });
-});
-
-productosRouter.get("/:id", async (req, res) => {
-  const productById = await contenedorProducts.getById(req.params.id);
-  if (!productById) {
+productosRouterf.get("/", async (req, res) => {
+    const productos = await contenedorFire.getAll();
     res.send({
-      error: `"El producto con el id # ${req.params.id} no existe"`,
+      message: "Success",
+      data: productos,
     });
-  } else res.send(productById);
 });
 
-productosRouter.post("/", async (req, res) => {
-  const checkAdmin = await contenedor.checkAdmin();
-  if (checkAdmin) {
-    const saveProduct = await contenedorProducts.saveProduct(req.body);
-
-    res.send({
-      message: "Product has been posted",
-      Product: saveProduct,
-    });
-  } else {
-    res.send({ error: -1, message: "Acceso Denegado" });
-  }
+productosRouterf.get("/:id", async (req, res) => {
+    const productById = await contenedorFire.getById(req.params.id);
+    if (!productById) {
+      res.send({
+        error: `"El producto con el id # ${req.params.id} no existe"`,
+      });
+    } else res.send(productById);
 });
 
-productosRouter.put("/:id", async (req, res) => {
+productosRouterf.post("/", async (req, res) => {
+    const checkAdmin = await contenedor.checkAdmin();
+    if (checkAdmin) {
+      const saveProduct = await contenedorFire.saveProduct(req.body);
+  
+      res.send({
+        message: "Product has been posted",
+        Product: saveProduct,
+      });
+    } else {
+      res.send({ error: -1, message: "Acceso Denegado" });
+    }
+});
+
+productosRouterf.put("/:id", async (req, res) => {
   const checkAdmin = await contenedor.checkAdmin();
   const producto = req.body;
   let newProduct = { id: req.params.id, ...producto };
 
   if (checkAdmin) {
-    const productById = await contenedorProducts.getById(req.params.id);
+    const productById = await contenedorFire.getById(req.params.id);
     if (!productById) {
       res.send({
         error: `"El producto con el id # ${req.params.id} no existe"`,
       });
     } else {
-      await contenedorProducts.update(newProduct)
+      await contenedorFire.update(newProduct)
         res.send({
           message: `"El producto con el id # ${req.params.id} ha sido Actualizado"`,
         })
@@ -79,18 +76,18 @@ productosRouter.put("/:id", async (req, res) => {
   }
 });
 
-productosRouter.delete("/:id", async (req, res) => {
+productosRouterf.delete("/:id", async (req, res) => {
 
   const checkAdmin = await contenedor.checkAdmin();
 
   if (checkAdmin) {
-    const productById = await contenedorProducts.getById(req.params.id);
+    const productById = await contenedorFire.getById(req.params.id);
     if (!productById) {
       res.send({
         error: `"El producto con el id # ${req.params.id} no existe"`,
       });
     } else {
-      await contenedorProducts.deleteById(req.params.id)
+      await contenedorFire.deleteById(req.params.id)
       res.send({
         message: `"El producto con el id # ${req.params.id}" ha sido borrado`,
       });
@@ -102,4 +99,4 @@ productosRouter.delete("/:id", async (req, res) => {
 });
 
 
-module.exports = productosRouter;
+module.exports = productosRouterf;

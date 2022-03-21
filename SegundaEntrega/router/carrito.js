@@ -8,6 +8,7 @@ const carritoRouter= Router()
 const Contenedorm = require("../containers/mongoContainerCart");
 const contenedorCart = new Contenedorm("Cart");
 
+
 const checkAdmin = true;
 
 carritoRouter.get('/',async(req,res) => {
@@ -53,10 +54,10 @@ carritoRouter.post('/',async(req,res) => {
 carritoRouter.post('/:id/productos',async(req,res) => {
     const nuevoProducto =req.body;
     const cartItem = [{id:req.params.id,producto:nuevoProducto}]
-    const idProducto = await contenedorCart.saveProduct(...cartItem);
- 
+    await contenedorCart.saveProduct(...cartItem);
+
     res.send(
-        idProducto)
+        {mensaje: "Done"})
 })
 
 carritoRouter.delete('/:id/productos/:id_prod',async(req,res)=>{

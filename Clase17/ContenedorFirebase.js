@@ -29,13 +29,7 @@ class Contenedor {
   async getAll() {
     try {
       const querySnapshot = await query.get();
-      let docs = querySnapshot.docs;
-
-      const response = docs.map((doc) => ({
-        id: doc.id,
-        document: doc.data().document,
-      }));
-      return response;
+      return querySnapshot.docs.map(doc => doc.data());
     } catch (error) {
       console.log(error);
     }
