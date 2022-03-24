@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/head'); %>
+    <link href="/css/style.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <header><%- include('../partials/header'); %></header>
+    <main>
+      <div class="jumbotron">
+        <form id="form" action="">
+          <button class="btn btn-success">
+            Click To Get 5 Random Products
+          </button>
+        </form>
+      </div>
+      <div class="jumbotron">
+        <h3>Products</h3>
+        <table class="table table-dark">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Price</th>
+              <th scope="col">Photo</th>
+            </tr>
+          </thead>
+          <tbody id="productContainer"></tbody>
+        </table>
+      </div>
+      <ul id="ulMessages"></ul>
+      <form id="formChat" action="">
+        <input
+          id="inputEmail"
+          autocomplete="off"
+          placeholder="Enter your Email"
+        />
+        <input
+          id="inputName"
+          autocomplete="off"
+          placeholder="Enter your Name"
+        />
+        <input
+          id="inputsurName"
+          autocomplete="off"
+          placeholder="Enter your surName"
+        />
+        <input
+          id="inputAge"
+          autocomplete="off"
+          placeholder="Enter your Age"
+        />
+        <input
+          id="inputAlias"
+          autocomplete="off"
+          placeholder="Enter your Alias"
+        />
+        <input
+          id="inputAvatar"
+          autocomplete="off"
+          placeholder="Enter your Avatar"
+        />
+        <input
+          id="inputMessage"
+          autocomplete="off"
+          placeholder="Type your message"
+        />
+
+        <button>Send</button>
+      </form>
+    </main>
+    <footer><%- include('../partials/footer'); %></footer>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var socket = io();
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        socket.emit("get products");
+      });
+      socket.on("get products", (productsArr) => {
+        productContainer.innerHTML = productsArr
+          .map(
+            (product) =>
+              "<tr>" +
+              "<td>" +
+              product.name +
+              "</td>" +
+              "<td>" +
+              "$ " +
+              product.price +
+              "</td>" +
+              "<td>" +
+              product.url +
+              "</td>" +
+              "</tr>"
+          )
+          .join("");
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+    </script>
+  </body>
+</html>

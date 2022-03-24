@@ -70,8 +70,6 @@ class Contenedor {
     }
   }
 
-  
-
   // PRODUCTS
 
   async saveProduct(cartItem) {
@@ -88,7 +86,7 @@ class Contenedor {
         precio: cartItem.producto.precio,
         stock: cartItem.producto.stock,
       };
-      const getProducts = await CartModel.findByIdAndUpdate(
+      await CartModel.findByIdAndUpdate(
         { _id: cartItem.id },
         {
           $push: {
@@ -97,8 +95,6 @@ class Contenedor {
         },
         { new: true, safe: true, upsert: true }
       );
-
-      console.log(getProducts);
     } catch (error) {
       console.log(`Server error: ${error}`);
     } finally {
@@ -109,11 +105,13 @@ class Contenedor {
     try {
       await mongoose.connect(URL);
       await CartModel.updateOne(
-        { _id: deleteInfo[0].id},
-        {$pull: {
-            products:{ id: deleteInfo[0].idProd},
+        { _id: deleteInfo[0].id },
+        {
+          $pull: {
+            products: { id: deleteInfo[0].idProd },
           },
-        },{ safe: true, multi:false }
+        },
+        { safe: true, multi: false }
       );
     } catch (error) {
       console.log(`Server error: ${error}`);
@@ -121,7 +119,6 @@ class Contenedor {
       mongoose.disconnect().catch((error) => console(error));
     }
   }
-
 }
 
 module.exports = Contenedor;

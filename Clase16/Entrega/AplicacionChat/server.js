@@ -9,7 +9,12 @@ const io = new Server(server);
 const Contenedor = require("../ContenedorDB");
 const contenedorProducts = new Contenedor("./options/knexConfig", "products");
 const ContenedorLite = require("../Contenedorsqlite");
-const contenedorMessages = new ContenedorLite("./options/sqlite3Config", "messages");
+const contenedorMessages = new ContenedorLite(
+  "./options/sqlite3Config",
+  "messages"
+);
+
+const { faker } = require("@faker-js/faker");
 
 const products = [];
 const messages = [];
@@ -21,11 +26,16 @@ app.get("/", (req, res) => {
   res.render("pages/index");
 });
 
+app.get("/api/productos-test", (req, res) => {
+  res.render("pages/products");
+});
+
 io.on("connection", (socket) => {
   console.log("a user connected");
   // send chat to the user that just connected
   socket.emit("send products", products);
   // // listening and sending msgs to all users
+
   socket.on("send products", (product) => {
     const getProducts = contenedorProducts.getAll("products");
     getProducts.then((res) => {
@@ -53,7 +63,6 @@ io.on("connection", (socket) => {
   // listening and sending mssgs to all users
 
   socket.on("chat message", (message) => {
-    
     const getMessages = contenedorMessages.getAll("messages");
     getMessages.then((res) => {
       for (let i = 0; i < res.length; i++) {
@@ -73,6 +82,18 @@ io.on("connection", (socket) => {
       console.log(messages);
       io.sockets.emit("chat message", messages);
     });
+  });
+  // PRODUCT PAGE
+  socket.on("get products", () => {
+    const productsArr = [];
+    for (let i = 0; i < 5; i++) {
+      productsArr.push({
+        name: faker.commerce.productName(),
+        price: faker.commerce.price(),
+        url: faker.image.image(),
+      });
+    }
+    socket.emit("get products", productsArr);
   });
   socket.on("disconnect", () => {
     console.log("user disconnected");
