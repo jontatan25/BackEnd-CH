@@ -2,8 +2,10 @@ const mongoose = require("mongoose");
 // MODELS
 
 const MessageModel = require("../models/MsModel");
+const UserModel = require("../models/userModel");
 
 const URL = "mongodb://localhost:27017/ecommerce";
+const AtlasUrl = "mongodb+srv://zamiipx:Fishman2@cluster0.rjl6p.mongodb.net/users?retryWrites=true&w=majority"
 
 const normalizr = require("normalizr");
 const normalize = normalizr.normalize;
@@ -182,6 +184,20 @@ class Contenedor {
         const normalizedChat = normalize(getProducts.messages, mySchema);
         return normalizedChat;
       }
+    } catch (error) {
+      console.log(`Server error: ${error}`);
+    } finally {
+      await mongoose.disconnect().catch((error) => console(error));
+    }
+  }
+  async saveUser(user) {
+    try {
+      await mongoose.connect(AtlasUrl);
+      console.log("mongo"+user)
+      const prod1 = new UserModel({
+        name: user.name
+      });
+      await prod1.save();
     } catch (error) {
       console.log(`Server error: ${error}`);
     } finally {

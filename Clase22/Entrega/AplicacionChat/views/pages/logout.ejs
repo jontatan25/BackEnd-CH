@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/head'); %>
+    <link href="/css/style.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <header><%- include('../partials/header'); %></header>
+    <main>
+    </main>
+    <footer><%- include('../partials/footer'); %></footer>
+    <script>
+        let redirect_Page = () => {
+        let tID = setTimeout(function () {
+            window.location.href = "/login";
+            window.clearTimeout(tID);		// clear time out.
+        }, 0);
+    }
+    redirect_Page()
+    </script>
+
+  </body>
+</html>

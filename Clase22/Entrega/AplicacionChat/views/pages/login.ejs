@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/head'); %>
+    <link href="/css/style.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <header><%- include('../partials/header'); %></header>
+    <main>
+      <div class="jumbotron" id="loginContainer">
+        <h3 style="margin-bottom: 7vh">Login de usuario</h3>
+        <form id="loginForm" action="/loggedIn" method="POST">
+          <label for="name">Nombre:</label>
+          <input
+            style="margin-bottom: 3vh"
+            id="loginInput"
+            type="text"
+            name="username"
+            placeholder="Ingrese su usuario"
+          />
+          <button
+            type="submit"
+            class="btn btn-primary"
+            style="display: block; margin-left: 3vw; width: 15vw"
+          >
+            Login
+          </button>
+        </form>
+      </div>
+    </main>
+    <footer><%- include('../partials/footer'); %></footer>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+      var socket = io();
+
+      const logOut = () => {
+        document.getElementById("loginContainer").innerHTML =
+          `<div style="display:flex;;background-color:#AED6F1"> 
+                <p  style="color:blue; margin-right:5px; font-weight:bold;  font-size:3em">Hasta Pronto. Redirigiendo al Login.. </p> 
+                
+          ` + "</div>";
+        let redirect_Page = () => {
+          let tID = setTimeout(function () {
+            window.location.href = "/logout";
+            window.clearTimeout(tID); // clear time out.
+          }, 2500);
+        };
+        redirect_Page();
+      };
+
+      socket.on("login", (userInfo) => {
+        if (userInfo !== null) {
+          document.getElementById("loginContainer").innerHTML =
+            `<div style="display:flex;background-color:#D5F5E3"> 
+                  <p  style="color:green; margin-right:5px; font-weight:bold;  font-size:3em">Bienvenid@  ${userInfo}</p> 
+                  <button
+                  onclick="logOut()"
+              class="btn btn-primary"
+              style="display: block; margin-left: 3vw; width: 15vw"
+            >
+              LogOut
+            </button>
+            ` + "</div>";
+          console.log("userInfo not null");
+          console.log(userInfo);
+        } else {
+          document.getElementById("loginContainer").innerHTML =
+            `<div> 
+                    <h3 style="margin-bottom: 7vh">Login de usuario</h3>
+              <form id="loginForm" action="/loggedIn" method="POST">
+                <label for="name">Nombre:</label>
+                <input
+                  style="margin-bottom: 3vh"
+                  id="loginInput"
+                  type="text"
+                  name="username"
+                  placeholder="Ingrese su usuario"
+                />
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  style="display: block; margin-left: 3vw; width: 15vw"
+                >
+                  Login
+                </button>
+              </form>
+            ` + "</div>";
+          console.log("userInfo is null");
+          loginForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            // Saving message info
+            loginForm.submit();
+            const userInfo = loginInput.value;
+            socket.emit("login", userInfo);
+            console.log("datos enviados");
+            console.log(userInfo);
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
