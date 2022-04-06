@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/head'); %>
+    <link href="/css/style.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <header><%- include('../partials/header'); %></header>
+    <main>
+        <div class="container text-center my-3">
+            <div class="jumbotron" style="background-color: rgb(191, 226, 191);color: darkgreen;">
+                <h1>Log in Successfull</h1>
+                <br>
+                <h2><i>Welcome <%= datos.nombre %></i></h2>
+                <br>
+                <img src="<%= datos.foto %>" width="100" alt=""><br>
+                <br>
+                <h4>Email:  <%= datos.email %></h4>
+                <br>
+                <br>
+                <h4>Visits: <%= contador %></h4>
+                <a class="btn btn-danger mt-3" href="/logout"><span class="fa fa-sign-out"></span><span> Logout</span></a>
+            </div>
+        </div>
+        
+    </main>
+    <footer><%- include('../partials/footer'); %></footer>
+    <script src="/socket.io/socket.io.js"></script>
+
+  </body>
+</html>

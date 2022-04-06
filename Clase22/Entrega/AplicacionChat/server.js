@@ -19,40 +19,78 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const advancedOptions = { useNewUrlParser: true, useUnifiedTopology: true };
 
-// NEED FOR POSTING
-let bodyParser = require("body-parser");
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+const passport = require("passport");
+const FacebookStrategy = require("passport-facebook").Strategy;
 
-app.use(cookieParser());
+const FACEBOOK_APP_ID = "344871087598654";
+const FACEBOOK_APP_SECRET = "0f7f6f1c361245b86057215c1891724a";
+// const jwt = require ("jsonwebtoken")
+// const tokenSecret = "claveSecreta"
+
+//SESSION
 app.use(
   session({
-    store: MongoStore.create({
-      mongoUrl:
-        "mongodb+srv://zamiipx:Fishman2@cluster0.rjl6p.mongodb.net/logindb?retryWrites=true&w=majority",
-      mongoOptions: advancedOptions,
-    }),
-    /* ----------------------------------------------------- */
-
-    secret: "secretWord",
+    secret: "mySecretKey",
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: 30000,
+      secure: "auto",
+      maxAge: 20000, //20 seg
     },
   })
 );
 
+// NEED FOR POSTING / MIDDLEWARES
+let bodyParser = require("body-parser");
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(cookieParser());
+
+
+
+//PASSPORT
+passport.use(
+  new FacebookStrategy(
+    {
+      clientID: FACEBOOK_APP_ID,
+      clientSecret: FACEBOOK_APP_SECRET,
+      callbackURL: "http://localhost:8000/auth/facebook/callback",
+      //opcional para acceder a mas datos:
+      profileFields: ['id', 'displayName', 'photos', 'email']
+    },
+    function(accessToken, refreshToken, profile, cb) {
+      console.log('accessToken: ', accessToken)
+      console.log('refreshToken: ', refreshToken)
+      console.log(profile);
+      cb(null, profile);
+    }  
+  )
+);
+
+// function generateToken(user) {
+//   return jwt.sign({ data: user }, tokenSecret, { expiresIn: "24h" });
+// }
+
+passport.serializeUser((user, cb) => {
+  cb(null, user);
+});
+
+passport.deserializeUser((obj, cb) => {
+  cb(null, obj);
+});
+
 let products = [];
-let messagesArr = [];
 
 let loggedIn = false;
 let loggedUserInfo = null;
-let actualSession = null;
 
+//TEMPLATE ENGINE
 // app.use(express.static(__dirname + '/public'));
 app.set("view engine", "ejs");
 
+// ROUTES
 app.get("/", (req, res) => {
   res.render("pages/index");
 });
@@ -61,17 +99,27 @@ app.get("/api/productos-test", (req, res) => {
   res.render("pages/products");
 });
 
+app.get("/auth/facebook", passport.authenticate("facebook",{ scope : ['email'] }));
+
+app.get(
+  "/auth/facebook/callback",
+  passport.authenticate("facebook", {
+    failureRedirect: "/",
+    successRedirect: "/datos",
+    authType: "reauthenticate",
+  })
+);
+
 app.get("/login", (req, res) => {
   if (req.session.user) {
     loggedIn = true;
     loggedUserInfo = req.session.user;
-    console.log("Creando session last");
-
+ 
   } else {
     loggedIn = true;
     req.session.user = null;
     loggedUserInfo = null;
-    console.log("Nueva sesion creada");
+    
     console.log(req.session);
   }
   res.render("pages/login");
@@ -84,42 +132,31 @@ app.post("/loggedIn", (req, res) => {
   res.render("pages/logged");
 });
 
-app.get("/counter", (req, res) => {
-  if (req.session.number) {
-    req.session.number++;
-    res.send(`Ud ha visitado el sitio ${req.session.number} veces.`);
+
+app.get('/datos', (req, res)=>{
+  if(req.isAuthenticated()){
+   if (!req.user.contador) {
+       req.user.contador = 0
+       
+   }
+   req.user.contador++
+   const datosUsuario = {
+       nombre: req.user.displayName,
+       foto: req.user.photos[0].value,
+       email: req.user.emails[0].value,
+   }
+   res.render('pages/datos', {contador: req.user.contador, datos: datosUsuario});
   } else {
-    req.session.number = 1;
-    res.send("Bienvenido!");
+   res.redirect('/login')
+   console.log('Usuario no autenticado')
   }
 });
-app.get("/logout", (req, res) => {
-  req.session.destroy((err) => {
-    if (!err) {
-      res.render("pages/logout");
-      loggedUserInfo = null;
-    } else res.send({ status: "Logout ERROR", body: err });
-  });
+
+app.get('/logout', (req, res)=>{
+   req.logout();
+   res.render('pages/logout')
 });
-app.get("/info", (req, res) => {
-  console.log("------------ req.session -------------");
-  console.log(req.session);
-  console.log("--------------------------------------");
 
-  console.log("----------- req.sessionID ------------");
-  console.log(req.sessionID);
-  console.log("--------------------------------------");
-
-  console.log("----------- req.cookies ------------");
-  console.log(req.cookies);
-  console.log("--------------------------------------");
-
-  console.log("---------- req.sessionStore ----------");
-  console.log(req.sessionStore);
-  console.log("--------------------------------------");
-
-  res.send("Send info ok!");
-});
 
 io.on("connection", (socket) => {
   console.log("a user connected");
@@ -146,17 +183,17 @@ io.on("connection", (socket) => {
     if (loggedIn == true && loggedUserInfo !== null) {
       let userInfo = loggedUserInfo;
       socket.emit("login", userInfo);
-      console.log("Logeado");
+      
     } else if (loggedIn == false && loggedUserInfo !== null) {
       let userInfo = null;
       loggedUserInfo = null;
       socket.emit("login", userInfo);
-      console.log("Sesion Expirada");
+      c
     } else {
-      console.log(loggedIn + "loggedInfo" + loggedUserInfo);
+     
       let userInfo = null;
       socket.emit("login", userInfo);
-      console.log("No logeado");
+     
     }
   };
   checklogin();
@@ -174,10 +211,10 @@ io.on("connection", (socket) => {
       let doc = await contenedorProducts.getAll();
       if (products.length == 0) {
         products = [...doc];
-        console.log("Products Gathered");
+        
       } else {
         products.push(newProduct);
-        console.log("New product added");
+     
       }
     };
     getProducts();
@@ -207,16 +244,15 @@ io.on("connection", (socket) => {
   socket.on("login", (userInfo) => {
     let saveUserName = async () => {
       if (loggedIn == true) {
-        console.log("logintrue");
+        
         await contenedorUsers.saveUser(userInfo);
         loggedUserName = userInfo;
-        console.log("loginuserInfo=" + userInfo);
-        console.log("loginloggedUserName =" + loggedUserName);
+       
         socket.emit("login", userInfo);
       } else {
         userInfo = null;
         loggedUserInfo = null;
-        console.log("loginfalse");
+       
         socket.emit("login", userInfo);
       }
     };
@@ -227,8 +263,8 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(3000, () => {
-  console.log("listening on PORT:3000");
+server.listen(8000, () => {
+  console.log("listening on PORT:8000");
 });
 
 server.on("error", (error) => console.log(`Server error: ${error}`));

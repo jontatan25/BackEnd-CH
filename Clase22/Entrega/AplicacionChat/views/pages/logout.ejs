@@ -7,6 +7,10 @@
   <body>
     <header><%- include('../partials/header'); %></header>
     <main>
+      <div class="jumbotron text-center" style="color: rgb(39, 0, 212);">
+      <h2>CERRANDO SESION . . .</h2>
+      <h3><i>Por favor espere.</i></h3>
+    </div>
     </main>
     <footer><%- include('../partials/footer'); %></footer>
     <script>
@@ -14,10 +18,9 @@
         let tID = setTimeout(function () {
             window.location.href = "/login";
             window.clearTimeout(tID);		// clear time out.
-        }, 0);
+        }, 2500);
     }
     redirect_Page()
     </script>
-
   </body>
 </html>
