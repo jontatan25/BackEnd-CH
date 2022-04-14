@@ -22,8 +22,25 @@ const advancedOptions = { useNewUrlParser: true, useUnifiedTopology: true };
 const passport = require("passport");
 const FacebookStrategy = require("passport-facebook").Strategy;
 
-const FACEBOOK_APP_ID = "344871087598654";
-const FACEBOOK_APP_SECRET = "0f7f6f1c361245b86057215c1891724a";
+//minimist
+let argv = require('minimist')(process.argv.slice(2));
+
+let options = {alias:{PORT:'p'},default:{PORT:'8080'}}
+
+console.log(argv, options)
+
+//dotENV
+require('dotenv').config()
+
+const FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID;
+const FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET;
+
+let PORT = ""
+
+if(argv.PORT)
+{PORT= argv.PORT}
+else {PORT=options.default.PORT}
+
 // const jwt = require ("jsonwebtoken")
 // const tokenSecret = "claveSecreta"
 
@@ -56,7 +73,7 @@ passport.use(
     {
       clientID: FACEBOOK_APP_ID,
       clientSecret: FACEBOOK_APP_SECRET,
-      callbackURL: "http://localhost:8000/auth/facebook/callback",
+      callbackURL: `http://localhost:${PORT}/auth/facebook/callback`,
       //opcional para acceder a mas datos:
       profileFields: ['id', 'displayName', 'photos', 'email']
     },
@@ -154,7 +171,20 @@ app.get('/datos', (req, res)=>{
 
 app.get('/logout', (req, res)=>{
    req.logout();
-   res.render('pages/logout')
+   res.redirect("http://localhost:3000")
+});
+
+app.get('/info', (req, res)=>{
+  res.render('pages/info',{
+
+    plataforma: process.platform,
+    version: process.version,
+    rss: process.memoryUsage(),
+    pathEjecucion: process.env.Path,
+    id: process.pid,
+    carpeta: process.cwd()
+  })
+
 });
 
 
@@ -263,8 +293,8 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(8000, () => {
-  console.log("listening on PORT:8000");
+server.listen(PORT, () => {
+  console.log(`listening on PORT:${PORT}`);
 });
 
 server.on("error", (error) => console.log(`Server error: ${error}`));
