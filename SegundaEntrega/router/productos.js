@@ -7,10 +7,14 @@ const productosRouter = Router();
 const Contenedorm = require("../containers/mongoContainer");
 const contenedorProducts = new Contenedorm("products");
 
-const ContenedorF = require("../containers/firebase");
-const contenedorFire = new ContenedorF("CartFirebase");
-
-
+function checkAuthentication(req, res, next) {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    console.log("Usuario no Logeado,redirect a Login");
+    res.send("redirect a Login");
+  }
+}
 
 productosRouter.get("/admin", async (req, res) => {
   const checkAdmin = await contenedor.checkAdmin();

@@ -3,6 +3,7 @@
     "express": "^4.17.3",
     "firebase-admin": "^10.0.2",
     "mongoose": "^6.2.7",
+    "nodemailer": "^6.7.5",
     "nodemon": "^2.0.15"
   },
   "name": "y",

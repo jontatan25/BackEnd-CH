@@ -2,10 +2,12 @@ const mongoose = require("mongoose");
 // MODELS
 const ProductModel = require("../models/ProductModel");
 const MessageModel = require("../models/CartModel");
+const UserModel = require("../models/Users");
 
 const URL = "mongodb://localhost:27017/ecommerce";
 
 let container = [];
+let userContainer = [];
 let containerMsg = [];
 
 class Contenedor {
@@ -13,19 +15,19 @@ class Contenedor {
     this.file = file;
   }
 
-  // PRODUCTS
-  async saveProduct(product) {
+  //USERS
+  async saveUser(user) {
     try {
       await mongoose.connect(URL);
       console.log(`Base de datos connectada en ${URL} `);
-      const prod1 = new ProductModel({
-        timestamp: date.now(),
-        nombre: product.nombre,
-        descripcion: product.descripcion,
-        codigo: product.codigo,
-        foto: product.foto,
-        precio: product.precio,
-        stock: product.stock,
+      const prod1 = new UserModel({
+        email: user.email,
+        password: user.password,
+        username: user.username,
+        direccion: user.direccion,
+        edad: user.edad,
+        telefono: user.telefono,
+        avatar: user.avatar,
       });
       await prod1.save();
       console.log("Documento Guardado");
@@ -33,6 +35,65 @@ class Contenedor {
       console.log(`Server error: ${error}`);
     } finally {
       await mongoose.disconnect().catch((error) => console(error));
+    }
+  }
+
+  async getAllUsers() {
+    try {
+      await mongoose.connect(URL);
+      console.log(`Base de datos connectada en ${URL} `);
+      let getUsers = await UserModel.find({});
+
+      getUsers.map((user) => userContainer.push(user));
+      console.log("Users had been adquired");
+      return userContainer;
+    } catch (error) {
+      console.log(`Server error: ${error}`);
+    } finally {
+      await mongoose.disconnect().catch((error) => console(error));
+    }
+  }
+
+  async getUser(username) {
+    try {
+      await mongoose.connect(URL);
+      console.log(`Base de datos connectada en ${URL} `);
+      const getUser = await UserModel.find({ username: username });
+      return getUser;
+    } catch (error) {
+      console.log(`Server error: ${error}`);
+    } finally {
+      mongoose.disconnect().catch((error) => console(error));
+    }
+  }
+
+  
+  // PRODUCTS
+  async saveProduct(info) {
+    try {
+      await mongoose.connect(URL);
+
+      const prod1 = {
+        nombre: info.product.nombre,
+        descripcion: info.product.descripcion,
+        codigo: info.product.codigo,
+        foto: info.product.foto,
+        precio: info.product.precio,
+        stock: info.product.stock,
+      };
+      await UserModel.findOneAndUpdate(
+        { username: info.user },
+        {
+          $push: {
+            cart: prod1,
+          },
+        },
+        { new: true, safe: true, upsert: true }
+      );
+    } catch (error) {
+      console.log(`Server error: ${error}`);
+    } finally {
+      mongoose.disconnect().catch((error) => console(error));
     }
   }
   async getAll() {
