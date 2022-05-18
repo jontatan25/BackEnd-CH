@@ -12,14 +12,16 @@ const LocalStrategy = require("passport-local").Strategy;
 const Bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const server = express();
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
+
+const twilio = require("./twilioConfig.js")
 
 //nodemailer
 let transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "###",
-    pass: "####", // generated ethereal password
+    user: "zamiipx@gmail.com",
+    pass: "Fishman1$1993", // generated ethereal password
   },
 });
 
@@ -49,7 +51,7 @@ function newOrderNodeMailer(info) {
   };
   transporter.sendMail(newOrder, (err) => {
     if (err) {
-      console.log(error);
+      console.log(err);
     } else {
       console.log("Se ha enviado la Orden al correo");
       console.log(newOrder);
@@ -262,10 +264,12 @@ server.post("/hacerOrden", checkAuthentication, (req, res) => {
       const user = await contenedorUsers.getUser(req.user[0].username);
       const info = {
         user: user[0].username,
+        telefono: user[0].telefono,
         orden: user[0].cart
       };
       newOrderNodeMailer(info);
-      console.log(info)
+      twilio.sendWSP(info)
+      twilio.sendSMS(info)
       res.send("Se ha Hecho su orden");
     } catch (error) {
       console.log(error);
