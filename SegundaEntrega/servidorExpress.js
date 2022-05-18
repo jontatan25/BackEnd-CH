@@ -18,8 +18,8 @@ const PORT = 8080;
 let transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "zamiipx@gmail.com",
-    pass: "Fishman1$1991", // generated ethereal password
+    user: "###",
+    pass: "####", // generated ethereal password
   },
 });
 
