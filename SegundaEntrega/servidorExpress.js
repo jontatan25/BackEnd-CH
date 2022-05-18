@@ -20,8 +20,8 @@ const twilio = require("./twilioConfig.js")
 let transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "zamiipx@gmail.com",
-    pass: "Fishman1$1993", // generated ethereal password
+    user: "#####@gmail.com",
+    pass: "#####", // generated ethereal password
   },
 });
 
