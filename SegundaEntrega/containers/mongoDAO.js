@@ -1,25 +1,23 @@
-const mongoose = require("mongoose");
-// MODELS
-const ProductModel = require("../models/ProductModel");
-const MessageModel = require("../models/CartModel");
-const UserModel = require("../models/Users");
 
-const URL = "mongodb://localhost:27017/ecommerce";
+const mongoose = require("mongoose");
+
+const config = require('./config')
 
 let container = [];
 let userContainer = [];
 let containerMsg = [];
 
-class Contenedor {
+class ProductosDao {
   constructor(file) {
     this.file = file;
+    this.client = mongoose
   }
 
   //USERS
   async saveUser(user) {
     try {
-      await mongoose.connect(URL);
-      console.log(`Base de datos connectada en ${URL} `);
+      await mongoose.connect(config.db.cnxString);
+      console.log(`Base de datos connectada en ${config.db.cnxString} `);
       const prod1 = new UserModel({
         email: user.email,
         password: user.password,
@@ -40,8 +38,8 @@ class Contenedor {
 
   async getAllUsers() {
     try {
-      await mongoose.connect(URL);
-      console.log(`Base de datos connectada en ${URL} `);
+      await mongoose.connect(config.db.cnxString);
+      console.log(`Base de datos connectada en ${config.db.cnxString} `);
       let getUsers = await UserModel.find({});
 
       getUsers.map((user) => userContainer.push(user));
@@ -56,8 +54,8 @@ class Contenedor {
 
   async getUser(username) {
     try {
-      await mongoose.connect(URL);
-      console.log(`Base de datos connectada en ${URL} `);
+      await mongoose.connect(config.db.cnxString);
+      console.log(`Base de datos connectada en ${config.db.cnxString} `);
       const getUser = await UserModel.find({ username: username });
       return getUser;
     } catch (error) {
@@ -71,7 +69,7 @@ class Contenedor {
   // PRODUCTS
   async saveProduct(info) {
     try {
-      await mongoose.connect(URL);
+      await mongoose.connect(config.db.cnxString);
 
       const prod1 = {
         nombre: info.product.nombre,
@@ -98,8 +96,8 @@ class Contenedor {
   }
   async getAll() {
     try {
-      await mongoose.connect(URL);
-      console.log(`Base de datos connectada en ${URL} `);
+      await mongoose.connect(config.db.cnxString);
+      console.log(`Base de datos connectada en ${config.db.cnxString} `);
       let getProducts = await ProductModel.find({});
 
       getProducts.map((product) => container.push(product));
@@ -113,8 +111,8 @@ class Contenedor {
   }
   async getById(id) {
     try {
-      await mongoose.connect(URL);
-      console.log(`Base de datos connectada en ${URL} `);
+      await mongoose.connect(config.db.cnxString);
+      console.log(`Base de datos connectada en ${config.db.cnxString} `);
       const getProducts = await ProductModel.find({ _id: id });
       return getProducts;
     } catch (error) {
@@ -126,7 +124,7 @@ class Contenedor {
   async update(newProduct) {
     try {
      
-      await mongoose.connect(URL);
+      await mongoose.connect(config.db.cnxString);
       await ProductModel.updateOne(
         { _id: newProduct.id },
         { $set: { precio: newProduct.precio} }
@@ -140,7 +138,7 @@ console.log(newProduct)
   }
   async deleteById(id) {
     try {
-      await mongoose.connect(URL);
+      await mongoose.connect(config.db.cnxString);
       await ProductModel.deleteOne({ _id: id });
       
     } catch (error) {
@@ -154,8 +152,8 @@ console.log(newProduct)
 
   async saveMessage(message) {
     try {
-      await mongoose.connect(URL);
-      console.log(`Base de datos connectada en ${URL} `);
+      await mongoose.connect(config.db.cnxString);
+      console.log(`Base de datos connectada en ${config.db.cnxString} `);
       const newMessage = new MessageModel({
         email: message.email,
         text: message.text,
@@ -172,8 +170,8 @@ console.log(newProduct)
 
   async getAllMessages() {
     try {
-      await mongoose.connect(URL);
-      console.log(`Base de datos connectada en ${URL} `);
+      await mongoose.connect(config.db.cnxString);
+      console.log(`Base de datos connectada en ${config.db.cnxString} `);
       let getMessages = await MessageModel.find({});
 
       getMessages.map((message) => containerMsg.push(message));
@@ -187,4 +185,4 @@ console.log(newProduct)
   }
 }
 
-module.exports = Contenedor;
+module.exports = ProductosDao;
