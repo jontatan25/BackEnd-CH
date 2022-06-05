@@ -1,5 +1,5 @@
 const express = require("express");
-const Contenedor = require("../Contenedor");
+const Contenedor = require("../containers/memoria");
 const contenedor = new Contenedor("./productos.JSON");
 const { Router } = express;
 const productosRouter = Router();

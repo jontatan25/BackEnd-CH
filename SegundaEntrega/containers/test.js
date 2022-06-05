@@ -1,13 +1,11 @@
 const ProductModel = require("../models/ProductModel");
 const MsModel = require("../models/MsModel");
 
-const Contenedor = require("../containers/mongoContainer");
+const Contenedor = require("./mongoContainer");
 const contenedorProducts = new Contenedor("products");
 
-const ContenedorM = require("../containers/mongoContainerM");
+const ContenedorM = require("./mongoContainerM");
 const contenedorMs = new ContenedorM("messages");
-
-
 
 // const URL = 'mongodb://localhost:27017/ecommerce'
 

@@ -1,285 +1,227 @@
-var express = require("express");
+const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
+const { faker } = require("@faker-js/faker");
 
-const productosRouter = require("./router/productos");
-const carritoRouter = require("./router/carrito");
+const  ProductosRepo = require ("./repositories/ProductosRepo");
+const repo = new ProductosRepo();
 
-const Contenedormongo = require("./containers/mongoContainer");
-const contenedorUsers = new Contenedormongo("users");
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
 
+// COOKIES
+const cookieParser = require("cookie-parser");
 const session = require("express-session");
-const passport = require("passport");
-const LocalStrategy = require("passport-local").Strategy;
-const Bcrypt = require("bcrypt");
-const nodemailer = require("nodemailer");
-const server = express();
-const PORT = process.env.PORT || 8080;
+const MongoStore = require("connect-mongo");
+const advancedOptions = { useNewUrlParser: true, useUnifiedTopology: true };
 
-const twilio = require("./twilioConfig.js")
+// NEED FOR POSTING
+let bodyParser = require("body-parser");
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-//nodemailer
-let transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: "#####@gmail.com",
-    pass: "#####", // generated ethereal password
-  },
-});
-
-function newAccNodeMailer(newUser) {
-  let newAccountCreated = {
-    from: "zamiipx@gmail.com",
-    to: "jhonn.photo@gmail.com",
-    subject: "Nuevo Registro de Usuario",
-    text: JSON.stringify(newUser, null, "\t"),
-  };
-  transporter.sendMail(newAccountCreated, (err) => {
-    if (err) {
-      console.log(error);
-    } else {
-      console.log("Email has been sent");
-      console.log(newUser);
-    }
-  });
-}
-
-function newOrderNodeMailer(info) {
-  let newOrder = {
-    from: "zamiipx@gmail.com",
-    to: "jhonn.photo@gmail.com",
-    subject: `Nuevo pedido de ${info.user}`,
-    text: JSON.stringify(info, null, "\t"),
-  };
-  transporter.sendMail(newOrder, (err) => {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log("Se ha enviado la Orden al correo");
-      console.log(newOrder);
-    }
-  });
-}
-
-//MIDDLEWARES
-
-server.use(
+app.use(cookieParser());
+app.use(
   session({
-    secret: "keyboard cat",
+    store: MongoStore.create({
+      mongoUrl:
+        "mongodb+srv://zamiipx:Fishman2@cluster0.rjl6p.mongodb.net/logindb?retryWrites=true&w=majority",
+      mongoOptions: advancedOptions,
+    }),
+    /* ----------------------------------------------------- */
+
+    secret: "secretWord",
     resave: false,
-    saveUninitialized: true,
-    cookie: { maxAge: 300000 },
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 30000,
+    },
   })
 );
 
-//Funciones para validar PASSPORT
-function isValidPassword(user, password) {
-  return Bcrypt.compareSync(password, user.password);
-}
+let products = [];
+let messagesArr = [];
 
-function createHash(password) {
-  return Bcrypt.hashSync(password, Bcrypt.genSaltSync(10), null);
-}
+let loggedIn = false;
+let loggedUserInfo = null;
+let actualSession = null;
 
-function checkAuthentication(req, res, next) {
-  if (req.isAuthenticated()) {
-    next();
+// app.use(express.static(__dirname + '/public'));
+
+app.get("/", (req, res) => {
+  res.render("HOME");
+});
+
+app.get("/users", (req, res) => {
+  await repo.getAll()
+})
+app.post("/createUser", (req, res) => {
+  await repo.add(req.body.user)
+});
+app.delete("/deleteUser", (req, res) => {
+  await repo.delete(req.body.id)
+});
+app.post("/findUser", (req, res) => {
+  await repo.findById(req.body.id)
+});
+app.post("/deleteAll", (req, res) => {
+  await repo.deleteAll()
+});
+app.get("/", (req, res) => {
+  res.render("HOME");
+});
+
+
+app.get("/messages", (req, res) => {
+  await repo.getAll()
+})
+app.post("/newmessage", (req, res) => {
+  await repo.add(req.body.user)
+});
+app.delete("/deletemessage", (req, res) => {
+  await repo.delete(req.body.id)
+});
+
+app.post("/deleteAllmessages", (req, res) => {
+  await repo.deleteAll()
+});
+
+
+app.get("/counter", (req, res) => {
+  if (req.session.number) {
+    req.session.number++;
+    res.send(`Ud ha visitado el sitio ${req.session.number} veces.`);
   } else {
-    console.log("Usuario no Logeado,redirect a Login");
-    res.send("redirect a Login");
+    req.session.number = 1;
+    res.send("Bienvenido!");
   }
-}
-function postSignup(req, res) {
-  var user = req.user;
-  res.send("Usuario Loggeado");
-}
-function failSignup(req, res) {
-  res.send("Error en Signup");
-}
-function postLogin(req, res) {
-  var user = req.user;
-  res.send("Usuario Loggeado");
-}
-function failLogin(req, res) {
-  res.send("Error en login");
-}
+});
+app.get("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (!err) {
+      res.render("pages/logout");
+      loggedUserInfo = null;
+    } else res.send({ status: "Logout ERROR", body: err });
+  });
+});
+app.get("/info", (req, res) => {
+  console.log("------------ req.session -------------");
+  console.log(req.session);
+  console.log("--------------------------------------");
 
-//PASSPORT SIGNUP
-passport.use(
-  "signup",
-  new LocalStrategy(
-    { passReqToCallback: true },
-    (req, username, password, done) => {
-      const findUser = async () => {
-        try {
-          const user = await contenedorUsers.getUser(username);
-          if (user.length > 0) {
-            console.log("user is already in use");
-            return done(null, false);
-          } else {
-            const newUser = {
-              username: username,
-              password: createHash(password),
-              email: req.body.email,
-              direccion: req.body.direccion,
-              edad: req.body.edad,
-              telefono: req.body.telefono,
-              avatar: req.body.avatar,
-              cart: [],
-            };
-            const saveUser = async () => {
-              try {
-                await contenedorUsers.saveUser(newUser);
-                console.log("Nuevo Usuario creado");
-                newAccNodeMailer(newUser);
-              } catch (error) {
-                console.log(error);
-              }
-            };
-            saveUser();
-            return done(null, true);
-          }
-        } catch (error) {
-          console.log(error);
-        }
-      };
-      findUser();
+  console.log("----------- req.sessionID ------------");
+  console.log(req.sessionID);
+  console.log("--------------------------------------");
+
+  console.log("----------- req.cookies ------------");
+  console.log(req.cookies);
+  console.log("--------------------------------------");
+
+  console.log("---------- req.sessionStore ----------");
+  console.log(req.sessionStore);
+  console.log("--------------------------------------");
+
+  res.send("Send info ok!");
+});
+
+io.on("connection", (socket) => {
+  console.log("a user connected");
+  let getMessages = async () => {
+    let normalizedInfo = await repo.getAllMessages();
+    if (normalizedInfo) {
+      socket.emit("chat message", normalizedInfo);
     }
-  )
-);
+  };
+  getMessages();
 
-//PASSPORT LOGIN
-passport.use(
-  "login",
-  new LocalStrategy((username, password, done) => {
-    const findUser = async () => {
-      try {
-        const user = await contenedorUsers.getUser(username);
-        if (user.length == 0) {
-          console.log("user not found");
-          return done(null, false);
-        } else if (!isValidPassword(user[0], password)) {
-          console.log("Invalid password");
-          return done(null, false);
-        } else {
-          console.log("Information Matched");
-          return done(null, user);
-        }
-      } catch (error) {
-        console.log(error);
+  let checklogin = () => {
+    if (loggedIn == true && loggedUserInfo !== null) {
+      let userInfo = loggedUserInfo;
+      socket.emit("login", userInfo);
+      console.log("Logeado");
+    } else if (loggedIn == false && loggedUserInfo !== null) {
+      let userInfo = null;
+      loggedUserInfo = null;
+      socket.emit("login", userInfo);
+      console.log("Sesion Expirada");
+    } else {
+      console.log(loggedIn + "loggedInfo" + loggedUserInfo);
+      let userInfo = null;
+      socket.emit("login", userInfo);
+      console.log("No logeado");
+    }
+  };
+  checklogin();
+
+  socket.on("send products", (product) => {
+    const newProduct = {
+      socketId: socket.id,
+      name: product.name,
+      price: product.price,
+      url: product.photoUrl,
+    };
+
+    let getProducts = async () => {
+      await contenedorProducts.saveProduct(newProduct);
+      let doc = await contenedorProducts.getAll();
+      if (products.length == 0) {
+        products = [...doc];
+        console.log("Products Gathered");
+      } else {
+        products.push(newProduct);
+        console.log("New product added");
       }
     };
-    findUser();
-  })
-);
+    getProducts();
+    socket.emit("send products", products);
+  });
 
-passport.serializeUser((user, cb) => {
-  cb(null, user);
-});
-
-passport.deserializeUser((obj, cb) => {
-  cb(null, obj);
-});
-
-//MIDDLEWARES\
-server.use(express.json());
-server.use(express.urlencoded({ extended: true }));
-server.use(passport.initialize());
-server.use(passport.session());
-
-//RUTAS
-
-server.use("/api/productos", productosRouter);
-// server.use("/api/productosf", productosRouterf);
-// server.use("/api/carrito", carritoRouter);
-// server.use("/api/carritof", carritoRouterf);
-
-server.get("/", (req, res, siguiente) => {
-  res.send("Home");
-});
-
-server.post(
-  "/signup",
-  passport.authenticate("signup", { failureRedirect: "/faillogin" }),
-  postSignup
-);
-
-server.get("/login", checkAuthentication, (req, res) => {
-  var user = req.user;
-  console.log(user);
-  res.send("Mostrando info de usuario");
-});
-server.post(
-  "/login",
-  passport.authenticate("login", { failureRedirect: "/faillogin" }),
-  postLogin
-);
-
-server.get("/faillogin", failLogin);
-
-server.get("/signup", (req, res, siguiente) => {
-  res.send("Pagina de Registro");
-});
-server.post(
-  "/signup",
-  passport.authenticate("signup", { failureRedirect: "/failsignnup" }),
-  postSignup
-);
-server.get("/failsignup", failSignup);
-
-server.get("/logout", (req, res, siguiente) => {
-  req.logout();
-  res.send("loggedOut");
-});
-
-server.get("/carrito", checkAuthentication, (req, res) => {
-  const findUser = async () => {
-    try {
-      const user = await contenedorUsers.getUser(req.user[0].username);
-      console.log(user[0].cart);
-      res.send("ITEMS EN EL CARRO" + JSON.stringify(user[0].cart, null, "\t"));
-    } catch (error) {
-      console.log(error);
+  socket.on("get products", () => {
+    const productsArr = [];
+    for (let i = 0; i < 5; i++) {
+      productsArr.push({
+        name: faker.commerce.productName(),
+        price: faker.commerce.price(),
+        url: faker.image.image(),
+      });
     }
-  };
-  findUser();
+    socket.emit("get products", productsArr);
+  });
+
+  socket.on("chat message", (userInfo) => {
+    let getMessages = async () => {
+      let normalizedInfo = await repo.saveMessage(userInfo);
+      socket.emit("chat message", normalizedInfo);
+    };
+    getMessages();
+  });
+
+  socket.on("login", (userInfo) => {
+    let saveUserName = async () => {
+      if (loggedIn == true) {
+        console.log("logintrue");
+        await contenedorUsers.saveUser(userInfo);
+        loggedUserName = userInfo;
+        console.log("loginuserInfo=" + userInfo);
+        console.log("loginloggedUserName =" + loggedUserName);
+        socket.emit("login", userInfo);
+      } else {
+        userInfo = null;
+        loggedUserInfo = null;
+        console.log("loginfalse");
+        socket.emit("login", userInfo);
+      }
+    };
+    saveUserName();
+  });
+  socket.on("logout", () => {
+    console.log("se ha cerrado sesion");
+  });
 });
 
-server.post("/carrito", checkAuthentication, (req, res) => {
-  const findUser = async () => {
-    try {
-      const info = {
-        user: req.user[0].username,
-        product: req.body,
-      };
-      await contenedorUsers.saveProduct(info);
-      res.send("Se han Añadido los objetos al carro");
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  findUser();
+server.listen(3000, () => {
+  console.log("listening on PORT:3000");
 });
-server.post("/hacerOrden", checkAuthentication, (req, res) => {
-  const findUser = async () => {
-    try {
-      const user = await contenedorUsers.getUser(req.user[0].username);
-      const info = {
-        user: user[0].username,
-        telefono: user[0].telefono,
-        orden: user[0].cart
-      };
-      newOrderNodeMailer(info);
-      twilio.sendWSP(info)
-      twilio.sendSMS(info)
-      res.send("Se ha Hecho su orden");
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  findUser();
-});
-server.get("*", (req, res) => {
-  res.send("Ruta no Implementada");
-});
-server.listen(PORT, () => {
-  console.log(`Servidor En el puerto # ${PORT}`);
-});
+
+server.on("error", (error) => console.log(`Server error: ${error}`));
