@@ -1,4 +1,4 @@
-export default class ProductoDto {
+module.exports = class ProductoDto {
   id;
   nombre;
   precio;

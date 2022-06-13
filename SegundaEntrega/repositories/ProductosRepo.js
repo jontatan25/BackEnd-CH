@@ -1,8 +1,8 @@
-import ProductoDto from "../dtos/ProductoDto.js";
-import Producto from "../modelos/Producto.js";
-import { getDao } from '../dao/ProductosDaoFactory.hjs'
+const ProductoDto = require ("../dtos/ProductoDto.js");
+const Producto = require ("../models/ProductModel");
+const getDao = require ('../dao/ProductosDaoFactory')
 
-export default class ProductosRepo {
+module.exports = class ProductosRepo {
 
     constructor() {
         this.dao = getDao()

@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
-import Config from '../config.js'
-import CustomError from '../errores/CustomError.js'
-import mongoose from 'mongoose';
-import DbClient from './DbClient.js'
+const Config = require  ('../config.js')
+const CustomError = require  ('../errores/CustomError.js')
+const mongoose = require  ('mongoose');
+const DbClient = require  ('./DbClient.js')
 
 class MyMongoClient extends DbClient {
     constructor() {
@@ -37,4 +37,4 @@ class MyMongoClient extends DbClient {
     }
 }
 
-export default MyMongoClient
+module.exports = MyMongoClient

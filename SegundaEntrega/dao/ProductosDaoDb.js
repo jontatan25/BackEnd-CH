@@ -1,8 +1,8 @@
-import ProductosDao from './ProductosDao.js'
+const ProductosDao = require ('./ProductosDao.js')
 const UserModel = require("../models/Users");
-import CustomError from '../errores/CustomError.js'
-import MyMongoClient from '../db/DbClientMongo.js'
-import Config from '../config.js'
+const CustomError = require ('../errores/CustomError.js')
+const MyMongoClient = require ('../db/DbClientMongo.js')
+const Config = require ('../config.js')
 
 class ProductosDaoDb extends ProductosDao {
 
@@ -99,4 +99,4 @@ class ProductosDaoDb extends ProductosDao {
     }
 }
 
-export default ProductosDaoDb
+module.exports= ProductosDaoDb

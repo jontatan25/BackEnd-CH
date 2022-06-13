@@ -1,6 +1,5 @@
-import { MongoClient } from "mongodb";
-
-export default class DbClient {
+const { MongoClient } = require ("mongodb");
+module.exports = class DbClient {
 
     constructor(url) {
         this.cliente = new MongoClient(url, {

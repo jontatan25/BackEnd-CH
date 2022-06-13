@@ -9,4 +9,4 @@ const Config = {
     }
 }
 
-export default Config
+module.exports = Config

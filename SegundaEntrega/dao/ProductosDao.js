@@ -25,4 +25,4 @@ class ProductosDao {
     }
 }
 
-export default ProductosDao
+module.exports =ProductosDao

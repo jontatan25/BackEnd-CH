@@ -53,19 +53,19 @@ app.get("/", (req, res) => {
   res.render("HOME");
 });
 
-app.get("/users", (req, res) => {
+app.get("/users", async (req, res) => {
   await repo.getAll()
 })
-app.post("/createUser", (req, res) => {
+app.post("/createUser", async (req, res) => {
   await repo.add(req.body.user)
 });
-app.delete("/deleteUser", (req, res) => {
+app.delete("/deleteUser",async  (req, res) => {
   await repo.delete(req.body.id)
 });
-app.post("/findUser", (req, res) => {
+app.post("/findUser", async (req, res) => {
   await repo.findById(req.body.id)
 });
-app.post("/deleteAll", (req, res) => {
+app.post("/deleteAll", async (req, res) => {
   await repo.deleteAll()
 });
 app.get("/", (req, res) => {
@@ -73,17 +73,17 @@ app.get("/", (req, res) => {
 });
 
 
-app.get("/messages", (req, res) => {
+app.get("/messages", async (req, res) => {
   await repo.getAll()
 })
-app.post("/newmessage", (req, res) => {
+app.post("/newmessage", async (req, res) => {
   await repo.add(req.body.user)
 });
-app.delete("/deletemessage", (req, res) => {
+app.delete("/deletemessage", async (req, res) => {
   await repo.delete(req.body.id)
 });
 
-app.post("/deleteAllmessages", (req, res) => {
+app.post("/deleteAllmessages", async (req, res) => {
   await repo.deleteAll()
 });
 
