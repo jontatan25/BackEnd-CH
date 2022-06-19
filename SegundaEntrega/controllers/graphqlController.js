@@ -26,7 +26,9 @@ const schema = buildSchema(`
     getProductos: [Producto],
   }
   type Mutation {
-    createProducto(datos: ProductoInput): Producto
+    addProducto(datos: ProductoInput): Producto,
+    updateProducto(id: ID!, datos: ProductoInput): Producto,
+    deleteProducto(id: ID!): Producto,
   }
 `);
 
@@ -44,16 +46,15 @@ class Producto {
     }
 }
 
-const productos = Productos
 
 async function getProductos() {
-    return await productos;
+    return await Productos.getAll();
 }
 
 async function addProducto({ producto }) {
     const id = crypto.randomBytes(10).toString('hex');
     const nuevoProducto = new Producto(id, datos)
-    Productos.add(nuevoProducto);
+    Productos.add(producto);
     return nuevoProducto;
 }
 async function deleteProducto({ id }) {
